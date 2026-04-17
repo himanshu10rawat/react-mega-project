@@ -16,14 +16,14 @@ class AuthService {
     try {
       const userAccount = await this.account.create({
         userId: ID.unique(),
-        email,
-        password,
-        name,
+        email: email,
+        password: password,
+        name: name,
       });
 
       if (userAccount) {
         //call another method
-        return this.login((email, password));
+        return this.login({ email, password });
       } else {
         return userAccount;
       }
