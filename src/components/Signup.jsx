@@ -25,8 +25,6 @@ export const Signup = () => {
         }
       }
     } catch (error) {
-      console.log("Error:", error);
-
       setError(error.message);
     }
   };
@@ -35,7 +33,7 @@ export const Signup = () => {
     <div className="flex items-center justify-center min-h-screen w-full py-8 md:py-12 px-3 sm:px-4">
       <div className="card-base w-full max-w-lg p-6 md:p-8 shadow-2xl">
         <div className="mb-6 flex justify-center">
-          <span className="inline-block w-16 md:w-20 h-16 md:h-20 bg-linear-to-br from-purple-600 to-violet-600 rounded-2xl flex items-center justify-center">
+          <span className="w-16 md:w-20 h-16 md:h-20 bg-linear-to-br from-purple-600 to-violet-600 rounded-2xl flex items-center justify-center">
             <Logo width="100%" />
           </span>
         </div>
@@ -75,7 +73,7 @@ export const Signup = () => {
               {...register("email", {
                 required: true,
                 validate: {
-                  matchPatern: (value) =>
+                  matchPattern: (value) =>
                     /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
                     "Email address must be a valid address",
                 },

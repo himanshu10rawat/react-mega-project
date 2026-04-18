@@ -26,7 +26,7 @@ const MyPosts = () => {
         if (getPosts) {
           dispatch(setBlogs(serializePostList(getPosts.rows)));
         } else {
-          dispatch(setError("Post not get!"));
+          dispatch(setError("Failed to get posts!"));
         }
       } catch (error) {
         dispatch(setError(error.message));

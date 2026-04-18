@@ -25,7 +25,7 @@ function App() {
       })
       .catch(() => dispatch(logout()))
       .finally(() => setLoading(false));
-  }, []);
+  }, [dispatch]);
 
   return (
     <ToastProvider>

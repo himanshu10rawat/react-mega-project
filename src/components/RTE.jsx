@@ -1,5 +1,6 @@
 import { Editor } from "@tinymce/tinymce-react";
 import { Controller } from "react-hook-form";
+import config from "../config/config";
 
 export default function RTE({ name, control, label }) {
   return (
@@ -16,7 +17,7 @@ export default function RTE({ name, control, label }) {
         render={({ field }) => (
           <div className="rounded-xl overflow-hidden shadow-lg">
             <Editor
-              apiKey="hy8g22dnjt9p6miw5k1puexnu2byo4d7b0z67potsp57dgug"
+              apiKey={config.tinyApiKey}
               value={field.value}
               onEditorChange={field.onChange}
               init={{

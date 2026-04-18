@@ -20,8 +20,7 @@ class StoreService {
         file,
       });
     } catch (error) {
-      console.log("Appwrite service :: uploadFile :: error", error);
-      return false;
+      return null;
     }
   }
 
@@ -32,8 +31,7 @@ class StoreService {
         fileId,
       });
     } catch (error) {
-      console.log("Appwrite service :: deleteFile :: error", error);
-      return false;
+      return null;
     }
   }
 

@@ -10,6 +10,13 @@ export const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
 
   /**
+   * Remove a specific toast by ID
+   */
+  const removeToast = useCallback((id) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, []);
+
+  /**
    * Show a toast notification
    * @param {string} message - The message to display
    * @param {string} type - Type of toast: 'success', 'error', 'info', 'warning'
@@ -29,14 +36,7 @@ export const ToastProvider = ({ children }) => {
     }
 
     return id;
-  }, []);
-
-  /**
-   * Remove a specific toast by ID
-   */
-  const removeToast = useCallback((id) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
-  }, []);
+  }, [removeToast]);
 
   const value = { showToast, removeToast, toasts };
 

@@ -21,7 +21,7 @@ const AllPost = () => {
         if (getPosts) {
           dispatch(setBlogs(getPosts.rows.map((post) => serializePost(post))));
         } else {
-          dispatch(setError("Posts not get!"));
+          dispatch(setError("Failed to get posts!"));
         }
       } catch (error) {
         dispatch(setError(error.message));
@@ -29,7 +29,7 @@ const AllPost = () => {
         dispatch(setLoading(false));
       }
     })();
-  }, []);
+  }, [dispatch]);
 
   if (loading) {
     return (

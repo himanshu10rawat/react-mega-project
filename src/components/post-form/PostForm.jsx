@@ -51,8 +51,7 @@ export default function PostForm({ post }) {
               try {
                 await storeService.deleteFile(post.featuredImage);
               } catch (deleteError) {
-                console.warn("Failed to delete old image:", deleteError);
-                // Don't fail the operation if deletion fails
+                // Silently ignore deletion errors
               }
             }
           } catch (fileError) {
@@ -107,7 +106,6 @@ export default function PostForm({ post }) {
         navigate(`/post/${dbPost.$id}`);
       }
     } catch (error) {
-      console.error("Post submission error:", error);
       const errorMessage =
         error.message || "An unexpected error occurred. Please try again.";
       setSubmitError(errorMessage);
@@ -197,7 +195,7 @@ export default function PostForm({ post }) {
 
           {/* Error Message Display */}
           {submitError && (
-            <div className="p-3 bg-red-500/20 border border-red-500 rounded-lg text-red-200 text-sm">
+            <div className="p-3 bg-red-500/20 border border-red-500 rounded-lg text-red-500 text-sm">
               <div className="flex items-start gap-2">
                 <span className="text-lg">⚠️</span>
                 <div>

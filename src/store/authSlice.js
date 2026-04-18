@@ -12,8 +12,6 @@ const authSlice = createSlice({
     login(state, action) {
       if (action.payload.userData) {
         state.status = true;
-      } else {
-        console.error("Login Dispatch method is wrong!!!");
       }
       state.userData = action.payload.userData;
     },

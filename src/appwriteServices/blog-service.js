@@ -27,7 +27,7 @@ class BlogService {
         },
       });
     } catch (error) {
-      console.log("Appwrite service :: createPost :: error", error);
+      return null;
     }
   }
 
@@ -45,7 +45,7 @@ class BlogService {
         },
       });
     } catch (error) {
-      console.log("Appwrite service :: updatePost :: error", error);
+      return null;
     }
   }
 
@@ -57,8 +57,7 @@ class BlogService {
         rowId: slug,
       });
     } catch (error) {
-      console.log("Appwrite service :: deletePost :: error", error);
-      return false;
+      return null;
     }
   }
 
@@ -70,8 +69,7 @@ class BlogService {
         rowId: slug,
       });
     } catch (error) {
-      console.log("Appwrite service :: getPost :: error", error);
-      return false;
+      return null;
     }
   }
 
@@ -83,8 +81,7 @@ class BlogService {
         queries,
       });
     } catch (error) {
-      console.log("Appwrite service :: getPostList :: error", error);
-      return false;
+      return null;
     }
   }
 }
