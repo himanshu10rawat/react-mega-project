@@ -4,6 +4,7 @@ import { Container, PostCard, SkeletonCard } from "../components";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setBlogs, setLoading, setError } from "../store/blogSlice";
+import { serializePostList } from "../utils/serializePost";
 import { Query } from "appwrite";
 
 const Home = () => {
@@ -22,7 +23,7 @@ const Home = () => {
           Query.equal("status", "active"),
         ]);
         if (getPosts) {
-          dispatch(setBlogs(getPosts.rows));
+          dispatch(setBlogs(serializePostList(getPosts.rows)));
         } else {
           dispatch(setError("Post not get!"));
         }
@@ -32,7 +33,7 @@ const Home = () => {
         dispatch(setLoading(false));
       }
     })();
-  }, []);
+  }, [dispatch]);
 
   if (loading) {
     return (

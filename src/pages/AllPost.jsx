@@ -3,6 +3,7 @@ import { Container, PostCard, SkeletonCard } from "../components";
 import blogService from "../appwriteServices/blog-service";
 import { useDispatch, useSelector } from "react-redux";
 import { setBlogs, setLoading, setError } from "../store/blogSlice";
+import { serializePost } from "../utils/serializePost";
 
 const AllPost = () => {
   const dispatch = useDispatch();
@@ -18,7 +19,7 @@ const AllPost = () => {
       try {
         const getPosts = await blogService.getPostList();
         if (getPosts) {
-          dispatch(setBlogs(getPosts.rows));
+          dispatch(setBlogs(getPosts.rows.map((post) => serializePost(post))));
         } else {
           dispatch(setError("Posts not get!"));
         }

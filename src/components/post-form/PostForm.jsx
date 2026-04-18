@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button, Input, RTE, Select } from "..";
 import storeService from "../../appwriteServices/store-service";
@@ -6,6 +6,8 @@ import blogService from "../../appwriteServices/blog-service";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addBlog, updatedBlog } from "../../store/blogSlice";
+import { serializePost } from "../../utils/serializePost";
+import { useToast } from "../../context/ToastContext";
 
 export default function PostForm({ post }) {
   const { register, handleSubmit, watch, setValue, control } = useForm({
@@ -20,43 +22,98 @@ export default function PostForm({ post }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.authReducer.userData);
+  const { showToast } = useToast();
+
+  // State for error handling and loading
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
   const submit = async (data) => {
-    if (post) {
-      const file = data.image[0]
-        ? await storeService.uploadFile(data.image[0])
-        : null;
+    try {
+      setIsSubmitting(true);
+      setSubmitError(null);
 
-      if (file) {
-        storeService.deleteFile(post.featuredImage);
-      }
+      if (post) {
+        // UPDATE POST FLOW
+        let fileId = post.featuredImage;
 
-      const dbPost = await blogService.updatePost(post.$id, {
-        ...data,
-        featuredImage: file ? file.$id : undefined,
-      });
+        // Handle image upload if provided
+        if (data.image?.[0]) {
+          try {
+            const file = await storeService.uploadFile(data.image[0]);
+            if (!file) {
+              throw new Error("File upload failed - no file returned");
+            }
+            fileId = file.$id;
 
-      if (dbPost) {
-        dispatch(updatedBlog(dbPost));
-        navigate(`/post/${dbPost.$id}`);
-      }
-    } else {
-      const file = await storeService.uploadFile(data.image[0]);
+            // Delete old image only if new one uploaded successfully
+            if (post.featuredImage) {
+              try {
+                await storeService.deleteFile(post.featuredImage);
+              } catch (deleteError) {
+                console.warn("Failed to delete old image:", deleteError);
+                // Don't fail the operation if deletion fails
+              }
+            }
+          } catch (fileError) {
+            throw new Error(
+              `Image upload failed: ${fileError.message || "Unknown error"}`,
+            );
+          }
+        }
 
-      if (file) {
-        const fileId = file.$id;
-        data.featuredImage = fileId;
-
-        const dbPost = await blogService.createPost({
+        const dbPost = await blogService.updatePost(post.$id, {
           ...data,
-          userId: userData.$id,
+          featuredImage: fileId,
         });
 
         if (dbPost) {
-          dispatch(addBlog(dbPost));
+          dispatch(updatedBlog(serializePost(dbPost)));
+          showToast("Post updated successfully!", "success");
           navigate(`/post/${dbPost.$id}`);
+        } else {
+          throw new Error("Failed to update post on server");
         }
+      } else {
+        // CREATE NEW POST FLOW
+        if (!data.image?.[0]) {
+          throw new Error("Featured image is required for new posts");
+        }
+
+        let file;
+        try {
+          file = await storeService.uploadFile(data.image[0]);
+          if (!file) {
+            throw new Error("File upload failed - no file returned");
+          }
+        } catch (fileError) {
+          throw new Error(
+            `Image upload failed: ${fileError.message || "Unknown error"}`,
+          );
+        }
+
+        const dbPost = await blogService.createPost({
+          ...data,
+          featuredImage: file.$id,
+          userId: userData.$id,
+        });
+
+        if (!dbPost) {
+          throw new Error("Failed to create blog post on server");
+        }
+
+        dispatch(addBlog(serializePost(dbPost)));
+        showToast("Post published successfully!", "success");
+        navigate(`/post/${dbPost.$id}`);
       }
+    } catch (error) {
+      console.error("Post submission error:", error);
+      const errorMessage =
+        error.message || "An unexpected error occurred. Please try again.";
+      setSubmitError(errorMessage);
+      showToast(errorMessage, "error", 5000); // 5 second duration for errors
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -118,6 +175,7 @@ export default function PostForm({ post }) {
             type="file"
             accept="image/png, image/jpg, image/jpeg, image/gif"
             {...register("image", { required: !post })}
+            disabled={isSubmitting}
           />
 
           {post && (
@@ -134,10 +192,39 @@ export default function PostForm({ post }) {
             options={["active", "inactive"]}
             label="Status"
             {...register("status", { required: true })}
+            disabled={isSubmitting}
           />
 
-          <Button type="submit" variant="primary" className="w-full">
-            {post ? "Update Post" : "Publish Post"}
+          {/* Error Message Display */}
+          {submitError && (
+            <div className="p-3 bg-red-500/20 border border-red-500 rounded-lg text-red-200 text-sm">
+              <div className="flex items-start gap-2">
+                <span className="text-lg">⚠️</span>
+                <div>
+                  <p className="font-semibold">Error</p>
+                  <p>{submitError}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Submit Button with Loading State */}
+          <Button
+            type="submit"
+            variant="primary"
+            className="w-full"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <span className="flex items-center justify-center gap-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                {post ? "Updating..." : "Publishing..."}
+              </span>
+            ) : post ? (
+              "Update Post"
+            ) : (
+              "Publish Post"
+            )}
           </Button>
         </div>
       </div>
