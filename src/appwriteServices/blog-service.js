@@ -1,5 +1,5 @@
 import config from "../config/config";
-import { Client, TablesDB, Query } from "appwrite";
+import { Client, TablesDB } from "appwrite";
 
 class BlogService {
   client = new Client();
@@ -75,7 +75,7 @@ class BlogService {
     }
   }
 
-  async getPostList(queries = [Query.equal("status", "active")]) {
+  async getPostList(queries) {
     try {
       return await this.tablesDB.listRows({
         databaseId: config.appwriteDatabaseId,

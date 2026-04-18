@@ -1,21 +1,35 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import blogService from "../appwriteServices/blog-service";
 import { Container, PostCard, SkeletonCard } from "../components";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { setBlogs, setLoading, setError } from "../store/blogSlice";
+import { Query } from "appwrite";
 
 const Home = () => {
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const {
+    loading,
+    blogs: posts,
+    error,
+  } = useSelector((state) => state.blogReducer);
 
   useEffect(() => {
     (async () => {
+      dispatch(setLoading(true));
       try {
-        const getPosts = await blogService.getPostList();
+        const getPosts = await blogService.getPostList([
+          Query.equal("status", "active"),
+        ]);
         if (getPosts) {
-          setPosts(getPosts.rows);
+          dispatch(setBlogs(getPosts.rows));
+        } else {
+          dispatch(setError("Post not get!"));
         }
+      } catch (error) {
+        dispatch(setError(error.message));
       } finally {
-        setLoading(false);
+        dispatch(setLoading(false));
       }
     })();
   }, []);
@@ -30,6 +44,27 @@ const Home = () => {
               .map((_, i) => (
                 <SkeletonCard key={i} />
               ))}
+          </div>
+        </Container>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full py-16 md:py-20 flex items-center">
+        <Container>
+          <div className="max-w-xl mx-auto rounded-3xl border border-white/10 bg-slate-950/60 p-8 text-center shadow-xl shadow-violet-500/10">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-500/10 text-red-300">
+              <span className="text-2xl">⚠️</span>
+            </div>
+            <h2 className="text-2xl font-semibold text-white mb-2">
+              Oops! Something went wrong
+            </h2>
+            <p className="text-sm text-gray-400 mb-4">{error}</p>
+            <p className="text-sm text-gray-500">
+              Please refresh the page or try again later.
+            </p>
           </div>
         </Container>
       </div>

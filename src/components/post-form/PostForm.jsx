@@ -4,7 +4,8 @@ import { Button, Input, RTE, Select } from "..";
 import storeService from "../../appwriteServices/store-service";
 import blogService from "../../appwriteServices/blog-service";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { addBlog, updatedBlog } from "../../store/blogSlice";
 
 export default function PostForm({ post }) {
   const { register, handleSubmit, watch, setValue, control } = useForm({
@@ -17,6 +18,7 @@ export default function PostForm({ post }) {
   });
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const userData = useSelector((state) => state.authReducer.userData);
 
   const submit = async (data) => {
@@ -35,6 +37,7 @@ export default function PostForm({ post }) {
       });
 
       if (dbPost) {
+        dispatch(updatedBlog(dbPost));
         navigate(`/post/${dbPost.$id}`);
       }
     } else {
@@ -50,6 +53,7 @@ export default function PostForm({ post }) {
         });
 
         if (dbPost) {
+          dispatch(addBlog(dbPost));
           navigate(`/post/${dbPost.$id}`);
         }
       }

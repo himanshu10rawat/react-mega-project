@@ -4,12 +4,14 @@ import storeService from "../appwriteServices/store-service";
 import blogService from "../appwriteServices/blog-service";
 import { Button, Container } from "../components";
 import parse from "html-react-parser";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteBlog } from "../store/blogSlice";
 
 export default function Post() {
   const [post, setPost] = useState(null);
   const { slug } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const userData = useSelector((state) => state.authReducer.userData);
 
@@ -27,6 +29,7 @@ export default function Post() {
   const deletePost = () => {
     blogService.deletePost(post.$id).then((status) => {
       if (status) {
+        dispatch(deleteBlog(post.$id));
         storeService.deleteFile(post.featuredImage);
         navigate("/");
       }
