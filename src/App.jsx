@@ -33,7 +33,7 @@ function App() {
         {!loading ? (
           <>
             <Header />
-            <main className="flex min-h-[calc(100vh-80px)] sm:min-h-[calc(100vh-80px)] md:min-h-[calc(100vh-80px)]">
+            <main className="flex flex-col min-h-[calc(100vh-80px)] sm:min-h-[calc(100vh-80px)] md:min-h-[calc(100vh-80px)]">
               <Outlet />
             </main>
             <Footer />

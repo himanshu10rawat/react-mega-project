@@ -17,8 +17,10 @@ const MyPosts = () => {
   const user = useSelector((state) => state.authReducer.userData);
 
   useEffect(() => {
+    dispatch(setLoading(true));
+    dispatch(setError(null));
+
     (async () => {
-      dispatch(setLoading(true));
       try {
         const getPosts = await blogService.getPostList([
           Query.equal("userId", user.$id),

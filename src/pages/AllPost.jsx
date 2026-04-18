@@ -14,8 +14,10 @@ const AllPost = () => {
   } = useSelector((state) => state.blogReducer);
 
   useEffect(() => {
+    dispatch(setLoading(true));
+    dispatch(setError(null));
+
     (async () => {
-      dispatch(setLoading(true));
       try {
         const getPosts = await blogService.getPostList();
         if (getPosts) {
