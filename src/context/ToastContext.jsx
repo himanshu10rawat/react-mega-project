@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useState } from "react";
 
-export const ToastContext = createContext();
+const ToastContext = createContext();
 
 /**
  * Toast Provider Component
@@ -22,21 +22,24 @@ export const ToastProvider = ({ children }) => {
    * @param {string} type - Type of toast: 'success', 'error', 'info', 'warning'
    * @param {number} duration - Duration in milliseconds (0 = permanent)
    */
-  const showToast = useCallback((message, type = "info", duration = 3000) => {
-    const id = Date.now();
-    const toast = { id, message, type };
+  const showToast = useCallback(
+    (message, type = "info", duration = 3000) => {
+      const id = Date.now();
+      const toast = { id, message, type };
 
-    setToasts((prev) => [...prev, toast]);
+      setToasts((prev) => [...prev, toast]);
 
-    // Auto-remove toast after duration
-    if (duration > 0) {
-      setTimeout(() => {
-        removeToast(id);
-      }, duration);
-    }
+      // Auto-remove toast after duration
+      if (duration > 0) {
+        setTimeout(() => {
+          removeToast(id);
+        }, duration);
+      }
 
-    return id;
-  }, [removeToast]);
+      return id;
+    },
+    [removeToast],
+  );
 
   const value = { showToast, removeToast, toasts };
 
